@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import SOCIAL_PROFILES from "./data/socialProfiles";
 
 class SocialProfile extends Component {
@@ -7,8 +7,10 @@ class SocialProfile extends Component {
 
         return (
             <div style={{ display: "inline-block", width: 25, margin: 10 }}>
-                <a href={link}>{link}</a>
-                <img src={icon} alt='icon' style={{ width: 25, height: 25 }}></img>
+                <a href={link}>
+                    <img src={icon} alt='social-profile' style={{ width: 25, height: 25 }} />
+                </a>
+                
             </div>
         )
     }
@@ -18,7 +20,7 @@ class SocialProfiles extends Component {
     render () {
         return (
             <div>
-                <h3>Social Profiles</h3>
+                <h3>Connect with me!</h3>
                 <div>
                     {
                         SOCIAL_PROFILES.map(SOCIAL_PROFILE => {

@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import Projects from './Projects'; 
+class App extends Component {
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    state = { displayBio: false };
+
+    // constructor() {
+    //     super();
+    //     this.state = { displayBio: false };
+    //     console.log('Component this', this);
+    //     this.toggleDisplayBio = this.toggleDisplayBio.bind(this);
+    // }
+
+    toggleDisplayBio = () => {
+        this.setState({ displayBio: !this.state.displayBio });
+    }
+    
+    render() {
+        return (
+            <div>
+                <h1>Hello!</h1>
+                <p>My name is Anna. I am a Software Developer.</p>
+                <p>I'm always looking forward to working on meaningful projects.</p>
+                {
+                    this.state.displayBio ? (
+                        <div>
+                            <p>I am Java Developer, with a keen interest in cloud and crypto.</p>
+                            <p>I enjoy coding and learning new technologies. I love chess, puzzling and problem solving.</p>
+                            <button onClick={this.toggleDisplayBio}>Show Less</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <button onClick={this.toggleDisplayBio}>Read More</button>
+                        </div>
+                    )
+                }
+                <hr />
+                    <Projects />
+            </div>
+        )
+    }
 }
 
 export default App;

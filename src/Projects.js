@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import PROJECTS from './data/projects';
 
 class Project extends Component {
-    render() {
+    render () {
         console.log('this.props', this.props);
-
         const { title, image, description, link } = this.props.project; 
 
         return (

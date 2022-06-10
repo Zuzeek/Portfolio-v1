@@ -6,12 +6,14 @@ class SocialProfile extends Component {
         const { link, icon } = this.props.socialProfile; 
 
         return (
-            <div style={{ display: "inline-block", width: 25, margin: 10 }}>
-                <a href={link}>
-                    <img src={icon} alt='social-profile' style={{ width: 25, height: 25 }} />
+            <span style={{ margin: 10 }}>
+                <a href={ link }>
+                    <img 
+                        src={ icon } 
+                        alt='social-profile' 
+                        style={{ width: 35, height: 35 }} />
                 </a>
-                
-            </div>
+            </span>
         )
     }
 }
@@ -25,7 +27,7 @@ class SocialProfiles extends Component {
                     {
                         SOCIAL_PROFILES.map(SOCIAL_PROFILE => {
                             return (
-                                <SocialProfile key={SOCIAL_PROFILE.id} socialProfile={SOCIAL_PROFILE} />
+                                <SocialProfile key={ SOCIAL_PROFILE.id } socialProfile={ SOCIAL_PROFILE } />
                             )
                         })
                     }

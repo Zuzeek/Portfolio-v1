@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html ng-controller="ConfigCtrl">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title ng-bind="conf.Title()"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#223e6e">
+    <link href="favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="/cvpn/https/mydeskiis-ext.webfarm.ms.com/Content/css?v=uFdh4RPZ0gU3xGjVo_iAu6BCFtYuLad66KnaOzd_X2w1" rel="stylesheet"/>
+
+    <script type="text/javascript">
+        var host = window.location.hostname;
+        if (host.indexOf("morganstanley.com") > -1) {
+            document.domain = 'morganstanley.com';
+        }
+        else {
+            document.domain = 'ms.com';
+        }
+    </script>
+    <script src="/cvpn/https/mydeskiis-ext.webfarm.ms.com/Scripts/js-1?v=D-wvFmIjsd0BcEc1EkHhtqmQ59PdqERgt7W711zVO0I1"></script>
+
+    <script src="/cvpn/https/mydeskiis-ext.webfarm.ms.com/Scripts/js-2?v=mJQ5zBlaq74aWltzvglZNmLcHjtPj0EdFQyMHSu7J1k1"></script>
+
+    <script src="/cvpn/https/mydeskiis-ext.webfarm.ms.com/Scripts/js-3?v=_ZsoDJHkVjI40DhtEiW0aGZCuzl_GhvdXI4eDoTorsE1"></script>
+
+    <script src="/cvpn/https/mydeskiis-ext.webfarm.ms.com/Scripts/js-4?v=QkLctfig0UJl8PovXFWweBtmkoMFEmggwB9KLRDDioI1"></script>
+
+</head>
+<body ng-class="{'mev': conf != null && conf.IsMEVUser, 'no-mev': !(conf != null && conf.IsMEVUser), 'touch': hasTouch, 'no-touch': !hasTouch}">
+<script src="/vpns/cookie_watch.js"></script>
+<!- client cookie watch -->
+
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="banner">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button"
+                        class="navbar-toggle collapsed"
+                        data-toggle="collapse"
+                        data-target="#main-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="" class="navbar-brand">myDesk</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="main-navbar-collapse">
+                <ul class="nav navbar-nav navbar-right" ng-cloak>
+                    <li class="touch-hidden visible-xs visible-sm mev-hidden">
+                        <a href="#help" target="_self">{{descriptions.menuHelp}}</a>
+                    </li>
+                    <li class="no-touch-hidden mev-hidden">
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#helpModal">
+                            {{descriptions.menuHelp}}
+                        </a>
+                    </li>
+                    <li class="mev-hidden">
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#settingsModal"
+                           title="{{descriptions.changeSettingsHelp}}"
+                           ng-show="conf"
+                           ng-action-log="action:settings">
+                            {{descriptions.settings}}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           ng-click="logout()"
+                           title="{{descriptions.exitHelp}}"
+                           ng-action-log="action:logout">
+                            {{descriptions.logout}} {{conf.UserName}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="nav-container visible-xs visible-sm mev-hidden">
+            <div class="container">
+                <nav class="row" role="navigation">
+                    <ul class="nav nav-pills" ng-cloak>
+                        <li>
+                            <a href="#desktops" target="_self">{{descriptions.menuDesktops}}</a>
+                        </li>
+                        <li>
+                            <a href="#applications" target="_self">{{descriptions.menuApplications}}</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </nav>
+
+    <div id="settingsModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{descriptions.settings}}</h4>
+                </div>
+                <div class="modal-body">
+                    <p ng-if="conf.AccessType === 'ext' && conf.IsRDPUser">
+                        <button type="button"
+                                class="btn btn-link"
+                                ng-class="{'btn-lg': hasTouch}"
+                                ng-click="setRDPChoice('nativerdp')"
+                                ng-action-log="set:setrdpchoice:nativerdp"
+                                title="{{descriptions.useMicrosoftRDPHelp}}">
+                            <span class="glyphicon"
+                                  ng-class="{'glyphicon-unchecked': conf.RDPChoice !== 'nativerdp', 'glyphicon-check': conf.RDPChoice === 'nativerdp'}">
+                            </span> {{descriptions.useMicrosoftRDP}}
+                        </button>
+                        <button type="button"
+                                class="btn btn-link"
+                                ng-class="{'btn-lg': hasTouch}"
+                                ng-click="setRDPChoice('pubrdp')"
+                                ng-action-log="set:setrdpchoice:pubrdp"
+                                title="{{descriptions.usePubRDPHelp}}">
+
+                            <span class="glyphicon"
+                                  ng-class="{'glyphicon-unchecked': conf.RDPChoice === 'nativerdp', 'glyphicon-check': conf.RDPChoice !== 'nativerdp'}">
+                            </span> {{descriptions.usePubRDP}}
+                        </button>
+                    </p>
+                    <p>
+                        <button type="button"
+                                class="btn btn-link"
+                                ng-class="{'btn-lg': hasTouch}"
+                                ng-click="persistBCPEnabled(!conf.BCPEnabled)"
+                                ng-disabled="!conf.HasBCPMachine || changing.BCPEnabled"
+                                ng-action-log="set:bcpflag:{{!conf.BCPEnabled}}"
+                                title="{{descriptions.showBCPHelp}}">
+
+                            <span class="glyphicon"
+                                  ng-class="{'glyphicon-unchecked': !conf.BCPEnabled, 'glyphicon-check': conf.BCPEnabled}"
+                                  ng-if="!changing.BCPEnabled"></span>
+                            <spin class="pref-setting-spinner"
+                                  spin-if="changing.BCPEnabled"
+                                  ng-if="changing.BCPEnabled"></spin> {{descriptions.showBCP}}
+                        </button>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="altCredsModal"
+         class="modal"
+         tabindex="-1"
+         role="dialog"
+         ng-controller="AltCredsCtrl"
+         modal-show="gettingAltCreds">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{descriptions.altCredsTitle}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert creds-alert-message"
+                         ng-class="{'fetching':'alert-info', 'timeout': 'alert-danger', 'failure': 'alert-danger', 'success': 'alert-success'}[altCredState]"
+                         ng-if="altCredState != 'ready'">
+                        <spin spin-if="altCredState == 'fetching'"
+                              ng-class="{'creds-fetching-spinner': altCredState == 'fetching'}"></spin>
+                        {{altCredMessage}}
+                    </div>
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="idField" class="col-sm-2 control-label">{{descriptions.id}}</label>
+                            <div class="col-sm-6">
+                                <input type="text"
+                                       class="form-control"
+                                       id="idField"
+                                       ng-model="userName"
+                                       focus-me="!currentUser && enterAltCreds"
+                                       ng-disabled="currentUser">
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <div class="input-group-addon">@</div>
+                                    <select class="form-control"
+                                            ng-model="userDomain"
+                                            ng-options="domain for domain in conf.CXADomains"
+                                            ng-disabled="currentUser"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="passwordField" class="col-sm-2 control-label">{{descriptions.password}}</label>
+                            <div class="col-sm-10">
+                                <input type="password"
+                                       class="form-control"
+                                       id="passwordField"
+                                       placeholder="Password"
+                                       ng-model="altPassword"
+                                       focus-me="currentUser && enterAltCreds"
+                                       ng-enter="canAltLoginProceed() && altLogin(altPassword)"
+                                       ng-disabled="altCredState == 'fetching' || altCredState == 'success'">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-info"
+                            ng-click="cancelAltLogin(false)"
+                            ng-disabled="altCredState == 'success'"
+                            ng-action-log="cancelled:alt-creds:{{altUser()}}">
+                        {{descriptions.cancel}}
+                    </button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            ng-disabled="!canAltLoginProceed()"
+                            ng-click="altLogin(altPassword)">
+                        {{descriptions.login}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="powerCycleModal"
+         class="modal"
+         tabindex="-1"
+         role="dialog"
+         ng-controller="PowerCycleCtrl"
+         modal-show="desktop">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{descriptions.powerCycleConfirm}} {{desktop.FriendlyName()}}?</h4>
+                </div>
+                <div class="modal-body">
+                    <button type="button"
+                            class="btn btn-link"
+                            ng-class="{'btn-lg': hasTouch}"
+                            ng-click="hardReset = !hardReset"
+                            ng-disabled="!canSoftReset"
+                            title="{{descriptions.hardResetMachineOptionHelp}}">
+
+                        <span class="glyphicon"
+                              ng-class="{'glyphicon-unchecked': !hardReset, 'glyphicon-check': hardReset}">
+                        </span> {{descriptions.hardResetMachineOption}}
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-info"
+                            ng-click="cancelReboot()">
+                        {{descriptions.cancel}}
+                    </button>
+                    <button type="button"
+                            class="btn btn-danger"
+                            ng-click="reboot()">
+                        {{descriptions.reboot}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="desktopDetailsModal" ncg-request-verification-token=vMHzFvgY6ESwhhpnTQJ--RIO3d9vZLMsyVfwkixhz3ygOeKLt84r4GILoNPIPKyPjSsHbKl4SoIlE5SPQIiquCGFKXs1:awufF9QSSCSxWwqW2z-_Hqtzey5FbxAUPkI0SE4BWVfkaEMwxuFf1hmIONpFbdEo5H-ePv3JSuUUXPACRJv_rOYY42U1
+         class="modal"
+         tabindex="-1"
+         role="dialog"
+         ng-controller="DesktopDetailsCtrl"
+         modal-show="desktop" ng-if="conf">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <div ng-hide="desktop.IsBCP" ng-switch on="defaultDesktopStatus(desktop.Id())">
+                            <button class="btn btn-link pull-right" ng-switch-when="current-changing" disabled>
+                                <spin class="pref-setting-spinner"></spin> {{descriptions.defaultDesktop}}
+                            </button>
+                            <button class="btn btn-link pull-right" ng-switch-when="other-changing" disabled>
+                                <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                            </button>
+                            <button class="btn btn-link pull-right" ng-switch-when="current"
+                                    title="{{descriptions.defaultDesktopClearHelp}}"
+                                    ng-click="unsetDefaultMachine()"
+                                    ng-action-log="unset:default:{{desktop.Id()}}">
+                                <span class="glyphicon glyphicon-check"></span> {{descriptions.defaultDesktop}}
+                            </button>
+                            <button class="btn btn-link pull-right" ng-switch-when="other"
+                                    title="{{descriptions.defaultDesktopHelp}}"
+                                    ng-click="persistDefaultMachine(desktop.Id(), desktop.DisplayName)"
+                                    ng-action-log="set:default:{{desktop.Id()}}">
+                                <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                            </button>
+                        </div>
+                        {{desktop.FriendlyName()}}
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <dl class="dl-horizontal">
+                        <dt ng-show="desktop.IsXenDesktop">{{descriptions.displayName}}</dt>
+                        <dd ng-show="desktop.IsXenDesktop">{{desktop.DisplayName}}</dd>
+                        <dt ng-show="desktop.HostName">{{descriptions.hostName}}</dt>
+                        <dd ng-show="desktop.HostName">{{desktop.HostName}}</dd>
+                        <dt ng-show="desktop.IsMachine && desktop.Model">{{descriptions.model}}</dt>
+                        <dd ng-show="desktop.IsMachine && desktop.Model">{{desktop.Model}}</dd>
+                        <dt ng-show="desktop.IsMachine && desktop.SystemType">{{descriptions.systemType}}</dt>
+                        <dd ng-show="desktop.IsMachine && desktop.SystemType">{{desktop.SystemType}}</dd>
+                    </dl>
+                    <hr>
+                    <dl class="dl-horizontal">
+                        <dt ng-show="desktop.IsXenDesktop">{{descriptions.citrixICA}}</dt>
+                        <dd ng-switch on="desktop.DesktopStatus" ng-show="desktop.IsXenDesktop">
+                            <span class="protocol-status-available" ng-switch-when="available">{{descriptions.icaStatusAvailable}}</span>
+                            <span class="protocol-status-available" ng-switch-when="disconnected">{{descriptions.icaStatusAvailable}}</span>
+                            <span class="protocol-status-session" ng-switch-when="inuse">{{descriptions.icaStatusSession}}</span>
+                            <span class="protocol-status-session" ng-switch-when="pending">{{descriptions.icaStatusSession}}</span>
+                            <span class="protocol-status-unavailable" ng-switch-when="off">{{descriptions.icaStatusUnavailable}}</span>
+                            <span class="protocol-status-unavailable" ng-switch-when="unregistered">{{descriptions.icaStatusUnavailable}}</span>
+                            <span class="protocol-status-unavailable" ng-switch-when="unavailable">{{descriptions.icaStatusUnavailable}}</span>
+                            <span class="protocol-status-group" ng-switch-when="group">{{descriptions.icaStatusGroup}}</span>
+                            <span class="protocol-status-unknown" ng-switch-default>{{descriptions.icaStatusUnknown}}</span>
+                        </dd>
+                        <dt ng-show="desktop.IsMachine">{{descriptions.remoteDesktop}}</dt>
+                        <dd ng-show="desktop.IsMachine" ng-switch on="desktop.MachineStatus">
+                            <span class="protocol-status-available" ng-switch-when="available">{{descriptions.rdpStatusAvailable}}</span>
+                            <span class="protocol-status-unavailable" ng-switch-when="unavailable">{{descriptions.rdpStatusUnavailable}}</span>
+                            <span class="protocol-status-unknown" ng-switch-default>descriptions.rdpStatusUnknown</span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-info"
+                            ng-click="cancel()">
+                        {{descriptions.cancel}}
+                    </button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">{{descriptions.launch}} <span class="caret"></span></button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-show="desktop.IsXenDesktop"><a href="#" ng-click="launch(desktop, 'ica')">{{descriptions.citrixICA}}</a></li>
+                            <li ng-show="desktop.IsMachine"><a href="#" ng-click="launch(desktop, 'rdp')">{{descriptions.remoteDesktop}}</a></li>
+                        </ul>
+                    </div>
+                    <button type="button"
+                            class="btn btn-default pull-right"
+                            ng-hide="desktop.PowerCycle == 'off'"
+                            ng-disabled="desktop.PowerStatus != ''"
+                            ng-click="confirmPowerCycleDesktop(desktop)"
+                            title="{{descriptions.rebootHelp}}">
+                        <span class="glyphicon glyphicon-refresh" ng-if="desktop.PowerStatus == ''"></span>
+                        <spin class="power-spinner" ng-if="desktop.PowerStatus != ''" spin-if="desktop.PowerStatus != ''"></spin>
+                        {{desktop.PowerStatus == '' ? descriptions.reboot : descriptions.rebootRequest}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" ng-controller="HelpCtrl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{descriptions.needHelp}}</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="docsSelectModal" class="help-input-label">{{descriptions.iWantTo}}</label>
+                    <select class="form-control input-lg"
+                            id="docsSelectModal"
+                            ng-model="doc"
+                            ng-options="d.Name for d in docs | helpFilter"
+                            ng-change="actionLog.info('action:help:' + doc.Name)"></select>
+                    <div class="small help-doc" ng-include="doc.File"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <noscript>
+        <div class="main-container">
+            <div class="alert alert-danger text-center">myDesk requires JavaScript enabled</div>
+        </div>
+    </noscript>
+
+    <div class="main-container" ng-cloak ng-controller="ResourcesCtrl" id="resources-container">
+        <div ng-controller="StatusCtrl">
+            <div class="alert-message-section" ng-show="hasMessages()">
+                <div class="alert alert-message"
+                     ng-repeat="message in messages | orderMessage | limitTo: maxMessages()"
+                     ng-class="{info: 'alert-success', warn: 'alert-warning', error: 'alert-danger'}[message.Level]">
+                    <a href="#"
+                       class="btn btn-alert-message pull-right"
+                       ng-class="{'btn-success': message.Level == 'info', 'btn-warning': message.Level == 'warn', 'btn-danger': message.Level == 'error', 'btn-lg': hasTouch, 'btn-xs': !hasTouch}"
+                       ng-show="message.Dismissible"
+                       ng-click="dismiss(message.Id)">
+                        {{descriptions.dismiss}}
+                    </a>
+                    <div bind-html-compile="message.Message"></div>
+                </div>
+                <button type="button" class="btn btn-link btn-block" ng-class="{'btn-lg': hasTouch}" ng-click="showAllMessages = !showAllMessages" ng-show="showAllMessagesEnabled()" ng-action-log="action:showAllMessages:true">
+                    <span class="glyphicon glyphicon-unchecked" ng-class="{'glyphicon-unchecked': !showAllMessages, 'glyphicon-check': showAllMessages}"></span> {{descriptions.showAllMessages}}
+                </button>
+            </div>
+        </div>
+
+        <div class="mev-hidden" ng-hide="(conf == null && desktops != null) || conf.IsVendorUser">
+            <span class="anchor" id="desktops"></span>
+            <h3>{{descriptions.connectComputers}}</h3>
+            <div class="desktops-list">
+                <div class="desktops-loading" ng-hide="desktops != null">
+                    <div class="resources-loading-spinner"
+                         spin="{lines:13, length:11, width:6, radius:15}"
+                         role="progressbar">
+                    </div>
+                </div>
+                <div class="text-center" ng-show="desktops.length == 0">You have no desktop resources assigned to you</div>
+                <div class="desktops-group" ng-repeat="desktop in desktops | orderBy:['-IsXenDesktop', 'DisplayName', 'Name']"
+                     ng-hide="desktop.IsBCP && !conf.BCPEnabled"
+                     ng-class="{bcp: desktop.IsBCP}">
+                    <div class="ica-desktop desktops-individual" ng-show="desktop.IsXenDesktop">
+                        <div class="desktops-item displayname-field"
+                             ng-class="{'desktop-launching': desktop.Launching}"
+                             ng-click="hasTouch && launchRDPDesktop(desktop)">
+                            <span ng-if="desktop.Launching" class="launching-message">
+                                {{descriptions.launching}} '{{desktop.DisplayName}}'...
+                            </span>
+                            <a href="#"
+                               class="launch-link"
+                               ng-click="!hasTouch && launchICADesktop(desktop)"
+                               ng-if="!desktop.Launching"
+                               title="{{descriptions.launchFromHelp}} {{desktop.FarmName}}"
+                               ng-class="{bold: desktop.Id() == conf.DefaultMachine}">
+                                {{desktop.DisplayName}}
+                            </a>
+                        </div>
+                        <div class="desktops-item connectiontype-field protocol-status" ng-switch on="desktop.DesktopStatus" ng-show="!hasTouch">
+                            <span class="protocol-status-available" title="{{descriptions.icaStatusAvailable}}" ng-switch-when="available">ICA</span>
+                            <span class="protocol-status-available" title="{{descriptions.icaStatusAvailable}}" ng-switch-when="disconnected">ICA</span>
+                            <span class="protocol-status-session" title="{{descriptions.icaStatusSession}}" ng-switch-when="inuse">ICA</span>
+                            <span class="protocol-status-session" title="{{descriptions.icaStatusSession}}" ng-switch-when="pending">ICA</span>
+                            <span class="protocol-status-unavailable" title="{{descriptions.icaStatusUnavailable}}" ng-switch-when="off">ICA</span>
+                            <span class="protocol-status-unavailable" title="{{descriptions.icaStatusUnavailable}}" ng-switch-when="unregistered">ICA</span>
+                            <span class="protocol-status-unavailable" title="{{descriptions.icaStatusUnavailable}}" ng-switch-when="unavailable">ICA</span>
+                            <span class="protocol-status-group" title="{{descriptions.icaStatusGroup}}" ng-switch-when="group">ICA</span>
+                            <span class="protocol-status-unknown" title="{{descriptions.icaStatusUnknown}}" ng-switch-default>ICA</span>
+                        </div>
+                        <div class="desktops-item type-field" ng-click="hasTouch && launchICADesktop(desktop)" title="Citrix">Citrix</div>
+                        <div class="desktops-item model-field" ng-click="hasTouch && launchICADesktop(desktop)" title="{{desktop.Description}}" ng-show="!hasTouch">{{desktop.Description}}</div>
+                        <div class="desktops-item power-field" ng-show="!hasTouch">
+                            <button type="button"
+                                    class="btn btn-xs btn-default power-link power-link-button"
+                                    ng-hide="desktop.PowerCycle == 'off'"
+                                    ng-disabled="desktop.PowerStatus != ''"
+                                    ng-click="confirmPowerCycleDesktop(desktop)"
+                                    title="{{descriptions.rebootHelp}}">
+                                <span class="glyphicon glyphicon-refresh" ng-if="desktop.PowerStatus == ''"></span>
+                                <spin class="power-spinner" ng-if="desktop.PowerStatus != ''" spin-if="desktop.PowerStatus != ''"></spin>
+                                {{desktop.PowerStatus == '' ? descriptions.reboot : descriptions.rebootRequest}}
+                            </button>
+                        </div>
+                        <div class="desktops-item default-field" ng-show="!hasTouch">
+                            <div ng-hide="desktop.IsBCP" ng-switch on="defaultDesktopStatus(desktop.Id())">
+                                <button class="btn btn-link" ng-switch-when="current-changing" disabled>
+                                    <spin class="pref-setting-spinner"></spin> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="other-changing" disabled>
+                                    <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="current"
+                                        title="{{descriptions.defaultDesktopClearHelp}}"
+                                        ng-click="unsetDefaultMachine()"
+                                        ng-action-log="unset:default:{{desktop.Id()}}">
+                                    <span class="glyphicon glyphicon-check"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="other"
+                                        title="{{descriptions.defaultDesktopHelp}}"
+                                        ng-click="persistDefaultMachine(desktop.Id(), desktop.DisplayName)"
+                                        ng-action-log="set:default:{{desktop.Id()}}">
+                                    <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                            </div>
+                        </div>
+                        <a href="#" class="desktop-more-link" ng-show="hasTouch" ng-click="desktopDetails(desktop)">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </a>
+                    </div>
+                    <div class="rdp-desktop"
+                         ng-class="{'desktops-individual': !desktop.IsXenDesktop, 'desktops-extended': desktop.IsXenDesktop}"
+                         ng-show="desktop.IsMachine && (!desktop.IsXenDesktop || (showRDPLinks && !hasTouch))">
+                        <div class="desktops-item displayname-field"
+                             ng-click="hasTouch && launchRDPDesktop(desktop)">
+                            <a href="#"
+                               class="launch-link"
+                               ng-click="!hasTouch && launchRDPDesktop(desktop)"
+                               title="{{descriptions.rdpTo}} {{desktop.HostName}}"
+                               ng-class="{bold: desktop.Id() == conf.DefaultMachine}"
+                               ng-show="isXenAppReadyLaunchingRDPDesktop()">
+                                {{desktop.Name}}
+                            </a>
+                            <a href="#"
+                               class="launch-link"
+                               ng-click="!hasTouch && launchRDPDesktop(desktop)"
+                               title="{{descriptions.waitXenApprdpload}}"
+                               ng-class="{bold: desktop.Id() == conf.DefaultMachine}"
+                               ng-show="!isXenAppReadyLaunchingRDPDesktop()">
+                                {{desktop.Name}}
+                            </a>
+                        </div>
+                        <div class="desktops-item connectiontype-field protocol-status" ng-switch on="desktop.MachineStatus" ng-show="!hasTouch">
+                            <span class="protocol-status-available" title="{{descriptions.rdpStatusAvailable}}" ng-switch-when="available">RDP</span>
+                            <span class="protocol-status-unavailable" title="{{descriptions.rdpStatusUnavailable}}" ng-switch-when="unavailable">RDP</span>
+                            <span class="protocol-status-unknown" title="{{descriptions.rdpStatusUnknown}}" ng-switch-default>RDP</span>
+                        </div>
+                        <div class="desktops-item type-field" ng-click="hasTouch && launchRDPDesktop(desktop)" title="{{desktop.SystemType}}" ng-show ="isXenAppReadyLaunchingRDPDesktop()">{{desktop.SystemType}}</div>
+                        <div class="desktops-item type-field" ng-click="hasTouch && launchRDPDesktop(desktop)" title="{{descriptions.waitXenApprdpload}}" ng-show ="!isXenAppReadyLaunchingRDPDesktop()">{{desktop.SystemType}}</div>
+                        <div class="desktops-item model-field" title="{{desktop.Model}}" ng-show="!hasTouch">{{desktop.Model}}</div>
+                        <div class="desktops-item power-field" ng-show="!hasTouch && !desktop.IsXenDesktop">
+                            <button type="button"
+                                    class="btn btn-xs btn-default power-link power-link-button"
+                                    ng-hide="desktop.PowerCycle == 'off'"
+                                    ng-disabled="desktop.PowerStatus != ''"
+                                    ng-click="confirmPowerCycleDesktop(desktop)"
+                                    title="{{descriptions.rebootHelp}}">
+                                <span class="glyphicon glyphicon-refresh" ng-if="desktop.PowerStatus == ''"></span>
+                                <spin class="power-spinner" ng-if="desktop.PowerStatus != ''" spin-if="desktop.PowerStatus != ''"></spin>
+                                {{desktop.PowerStatus == '' ? descriptions.reboot : descriptions.rebootRequest}}
+                            </button>
+                        </div>
+                        <div class="desktops-item default-field" ng-show="!hasTouch && !desktop.IsXenDesktop">
+                            <div ng-hide="desktop.IsBCP" ng-switch on="defaultDesktopStatus(desktop.Id())">
+                                <button class="btn btn-link" ng-switch-when="current-changing" disabled>
+                                    <spin class="pref-setting-spinner"></spin> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="other-changing" disabled>
+                                    <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="current"
+                                        title="{{descriptions.defaultDesktopClearHelp}}"
+                                        ng-click="unsetDefaultMachine()"
+                                        ng-action-log="unset:default:{{desktop.Id()}}">
+                                    <span class="glyphicon glyphicon-check"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                                <button class="btn btn-link" ng-switch-when="other"
+                                        title="{{descriptions.defaultDesktopHelp}}"
+                                        ng-click="persistDefaultMachine(desktop.Id(), desktop.Name)"
+                                        ng-action-log="set:default:{{desktop.Id()}}">
+                                    <span class="glyphicon glyphicon-unchecked"></span> {{descriptions.defaultDesktop}}
+                                </button>
+                            </div>
+                        </div>
+                        <a href="#" class="desktop-more-link" ng-show="hasTouch" ng-click="desktopDetails(desktop)">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row spaced-row" ng-show="conf && isXenAppReadyLaunchingRDPDesktop(true)">
+                <div ng-class="{'col-md-12 col-lg-6': hasTouch, 'col-md-12 col-lg-5': !hasTouch}">
+                    <div class="input-group" ng-class="{'input-group-lg': hasTouch}">
+                        <input type="text"
+                               class="form-control"
+                               placeholder="{{descriptions.hostName}}"
+                               ng-model="hostname"
+                               title="{{descriptions.connectToHelp}}"
+                               ng-enter="launchRDPDesktop({HostName: hostname}, true)"/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-info"
+                                    type="button"
+                                    role="button"
+                                    ng-disabled="!hostname"
+                                    ng-click="launchRDPDesktop({HostName: hostname}, true)"
+                                    ng-action-log="action:launch:{{hostname}}"
+                                    title="{{descriptions.connectHelp}}">
+                                {{descriptions.connect}}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div ng-class="{'col-md-12 col-lg-6': hasTouch, 'col-md-12 col-lg-3': !hasTouch}">
+                    <button type="button"
+                            class="btn btn-default btn-block"
+                            ng-class="{'btn-lg': hasTouch}"
+                            ng-click="refreshDesktops()"
+                            ng-action-log="action:refresh"
+                            ng-disabled="!desktops" role="button"
+                            title="{{descriptions.refreshHelp}}">
+                        <span class="glyphicon glyphicon-refresh"></span> {{descriptions.refresh}}
+                    </button>
+                </div>
+                <div class="col-md-12 col-lg-4" ng-show="!hasTouch">
+                    <button type="button"
+                            class="btn btn-link btn-block"
+                            ng-class="{'btn-lg': hasTouch}"
+                            ng-click="showRDPLinks = !showRDPLinks"
+                            ng-disabled="hideRDP"
+                            ng-action-log="action:rdp:{{!showRDPLinks}}">
+                        <span class="glyphicon" ng-class="{'glyphicon-unchecked': !showRDPLinks, 'glyphicon-check': showRDPLinks}"></span> {{descriptions.showRDP}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div ng-class="{'row': !hasTouch || conf != null && conf.IsMEVUser}">
+            <div ng-class="{'col-md-8': !hasTouch || conf != null && conf.IsMEVUser}" ng-show="conf">
+
+                <div class="mydesk-section mev-hidden applications-section" ng-cloak ng-controller="ApplicationsCtrl">
+                    <span class="anchor" id="applications"></span>
+                    <div class="folder-filter-header">
+                        <h3 class="folder-filter-field">{{descriptions.otherApplications}}</h3>
+                        <div class="folder-filter-spacer"></div>
+                        <select id="currentUser"
+                                class="form-control folder-filter-field"
+                                ng-class="{'input-lg': hasTouch}"
+                                ng-model="currentXAUserId"
+                                ng-change="changeUser()">
+                            <option ng-repeat="(userKey, user) in currentXAUsers" ng-value="user.Id">{{user.Id}}</option>
+                            <option value="">{{descriptions.otherUser}}</option>
+                        </select>
+                    </div>
+                    <form class="form-inline">
+                        <div class="form-group folder-form-group">
+                            <label for="currentXAFarm" class="folder-input-label">{{descriptions.xaFarm}}</label>
+                            <select class="form-control folder-filter-field"
+                                    id="currentXAFarm"
+                                    ng-model="currentXAFarm"
+                                    ng-class="{'input-lg': hasTouch}"
+                                    ng-options="farm for farm in currentXAUser.FoldersMap | folderMapFilter"
+                                    ng-change="filterApplications()">
+                                <option value="">{{descriptions.allFarms}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group folder-form-group">
+                            <label for="currentFolder" class="folder-input-label">{{descriptions.folder}}</label>
+                            <select class="form-control folder-filter-field"
+                                    id="currentFolder"
+                                    ng-model="currentFolder"
+                                    ng-class="{'input-lg': hasTouch}"
+                                    ng-options="folder for folder in currentXAUser.FoldersMap[currentXAFarm] | folderMapFilter"
+                                    ng-change="filterApplications()"
+                                    ng-disabled="!currentXAFarm">
+                                <option value="">{{descriptions.homeFolder}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group folder-form-group">
+                            <label for="currentFolderSearch" class="folder-input-label">{{descriptions.search}}</label>
+                            <input type="text"
+                                   id="currentFolderSearch"
+                                   ng-class="{'input-lg': hasTouch}"
+                                   class="form-control folder-filter-field"
+                                   placeholder="{{descriptions.applicationName}}"
+                                   ng-model="applicationSearch">
+                        </div>
+                    </form>
+                    <div class="xa-description visible-lg touch-hidden">
+                        <p class="small text-brand">{{descriptions.appsNote1}}</p>
+                        <p class="small text-secondary">{{descriptions.appsNote2}}</p>
+                    </div>
+                    <hr class="hr-slim">
+                    <div class="xa-list">
+                        <div class="truncate xa-link"
+                             ng-repeat="application in currentXAUser.Applications|filter:folderSearch:true|filter:{DisplayName: applicationSearch}"
+                             ng-click="hasTouch && launchICAApplication(application)">
+                            <a href="#" ng-click="!hasTouch && launchICAApplication(application)"
+                               title="{{application.FarmFriendlyName}}: {{application.DisplayName}}">
+                                <img ng-src="{{getDssoIconPath(application, !hasTouch)}}" class="xa-icon" />{{application.DisplayName}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mydesk-section no-mev-hidden">
+                    <h3 id="mev">{{descriptions.mevUndoRestrictions}}</h3>
+                    <div class="mev-section">
+                        <p class="small text-brand" ng-bind-html="descriptions.mevAccessToAdditionalSystems">{{descriptions.mevAccessToAdditionalSystems}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mev-hidden touch-hidden">
+                <div class="mydesk-section" ng-controller="HelpCtrl">
+                    <span class="anchor" id="help"></span>
+                    <h3>{{descriptions.needHelp}}</h3>
+                    <label for="docsSelect" class="help-input-label">{{descriptions.iWantTo}}</label>
+                    <select class="form-control"
+                            id="docsSelect"
+                            ng-model="doc"
+                            ng-options="d.Name for d in docs | helpFilter"
+                            ng-change="actionLog.info('action:help:' + doc.Name)"></select>
+                    <div class="small help-doc" ng-include="doc.File"></div>
+                </div>
+            </div>
+
+            <div class="col-md-4 no-mev-hidden">
+                <div ng-controller="HelpCtrl">
+                    <div class="small help-doc" ng-include="phoneNumbers.File"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

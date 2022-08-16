@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Projects from './Projects'; 
-import SocialProfiles from './SocialProfiles';
+import Projects from './components/Projects'; 
+import SocialProfiles from './components/SocialProfiles';
 import profile from './assets/profile.jpg';
 class App extends Component {
 
